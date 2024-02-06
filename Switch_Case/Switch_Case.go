@@ -3,8 +3,7 @@
 package main
 
 import (
-	"fmt"cmd
-	
+	"fmt"
 	"math/rand"
 	"time"
 )
