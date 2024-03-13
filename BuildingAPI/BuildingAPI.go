@@ -12,6 +12,10 @@ import(
 	"encoding/json"
 	"net/http"
 	"fmt"
+
+	"math/rand"
+	"strconv"
+	"time"
 	"github.com/gorilla/mux"
 
 )
@@ -100,7 +104,7 @@ in sample server tutorial so kindly check it for more details.
 
 func renderingHomePage(w http.ResponseWriter , r *http.Request){
 
-	return w.Write([]byte("<h1>This is Our Homepage</h1>"))
+	w.Write([]byte("<h1>This is Our Homepage</h1>"))
 
 
 }
@@ -219,6 +223,88 @@ func getOneCourse(w http.ResponseWriter , r *http.Request){
 
 	}
 
+
+}	
+
+/*
+
+So Now Making another controller/function for adding a course into our fake db for now , dont worry we
+will see/use a real database.
+
+So in the beginning  we are doing the same things like we were doing till now , it would be better if you
+would type this again and again then only you will get familiar with the syntax instead of copy paste
+you can do the copy paste when you get familiar with this.
+
+so first of all we are checking that if the user is providing something in the body or not.
+
+if there is nothing in the body then we will send the response saying ody of the course cannot be empty.
+
+Now after checking the body we are creating a variable of type struct
+
+After this we are decoding the data we are getting from the user which is stored inside r as it is our request
+and with r.Body we are getting request.Body so getting the data provided by the user and with the help of
+Decode we gonna decode the data into our struct format  as we are providing the refrence of the variable
+which is of our struct type.
+
+After this we are using isEmpty method on the course we are getting to check whether the course we are getting
+is valid or not , if the course is not valid then we are sending a response
+saying Data is empty , exiting from the process and after that using return.
+
+Now we have to enter the course which the user is providing , so for that we have to generate an id
+so we can add that course with respect to that id , so therefore we will generate an id now.
+
+So for generating a random number i have used rand(this should be math/random and not crypto/random , i have
+seen many people making this mistake then complain about not getting the random number or some error).
+
+rand.Seed has been depreciated therefore i am using different method that will gonna generate the random number
+for us
+
+Dont worry we are doing this just for our fake db as we will use mongo or any other database that will
+automatically generate an id for us.
+
+After getting that random number we are setting it in the place of courseId and after that adding new course
+into our fake db with the help of append method , if you have taken my previous sessions then you know
+how to use append method and how we can create a new slice with the help of append method.
+
+Sending the new course as response to show that the new course has been added successfully into our fake db.
+
+Then at last using return.
+
+*/
+
+
+func addOneCourse(w http.ResponseWriter , r *http.Request){
+
+	fmt.Println("Adding One Course");
+
+	w.Header().Set("Content-Type" , "application/json");
+
+
+	if r.Body == nil{
+
+		json.NewEncoder(w).Encode("Please Provide Data To Add Course")
+
+	}
+
+	var course Course
+
+	json.NewDecoder(r.Body).Decode(&course);
+
+	if course.checkIfEmpty(){
+
+		json.NewEncoder(w).Encode("Body of the course cannot be empty");
+
+	}
+
+	source := rand.NewSource(time.Now().UnixNano());
+
+	randomNumber := rand.New(source);
+
+	course.CourseId = strconv.Itoa(randomNumber.Intn(20));
+
+	courses = append(courses , course);
+
+	json.NewEncoder(w).Encode(course);
 
 }	
 
