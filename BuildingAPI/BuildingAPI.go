@@ -1,4 +1,4 @@
-/*In this session we gonna see how we can create a proper REST API but locally as we gonna use 
+/*In this session we gonna see how we can create a proper REST API but locally as we gonna use
 slice instead of DB.
 Dont worry we are just getting a basic idea that how we can do it later on we will work with the mongodb.
 
@@ -7,39 +7,34 @@ so that you can understand it better.*/
 
 package main
 
-import(
-
+import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"math/rand"
 	"strconv"
 	"time"
-	"github.com/gorilla/mux"
 
+	"github.com/gorilla/mux"
 )
 
-func main(){
-
-
+func main() {
 
 }
 
-								// MODEL SECTION
+// MODEL SECTION
 
-/*we gonna make a struct and will make a slice of that struct , as if you have follow my struct 
-tutorial then you know how to create a struct and after that we are using json , you know what it means , 
+/*we gonna make a struct and will make a slice of that struct , as if you have follow my struct
+tutorial then you know how to create a struct and after that we are using json , you know what it means ,
 it means that what will the user as a response in the form of json thats it , nothing new.*/
 
-type Course struct{
-
-	CourseId string `json:"id"`
-	CourseName string `json:"name"`
-	CoursePrice int `json:"price"`
-	CourseAuthor Author `json:"author"`//made this of Author type which is the struct we made below.
-	Tags []string `json:"tags,omitempty"`
-
+type Course struct {
+	CourseId     string   `json:"id"`
+	CourseName   string   `json:"name"`
+	CoursePrice  int      `json:"price"`
+	CourseAuthor Author   `json:"author"` //made this of Author type which is the struct we made below.
+	Tags         []string `json:"tags,omitempty"`
 }
 
 // Integrated struct into another struct just to get more information and also increasing little bit complexity.
@@ -52,15 +47,12 @@ If you have ever worked with nodejs or have a knowledge about backend so you can
 So you can understand it like this like we are making model in this session
 */
 
-
-type Author struct{
-
-	AuthorName string `json:"authorname"`
+type Author struct {
+	AuthorName    string `json:"authorname"`
 	AuthorWebsite string `json:"authorwebsite"`
-
 }
 
-var courses []Course;//Now this will work as our local database or can say fake DB. Our all work gonna revolve around this now.
+var courses []Course //Now this will work as our local database or can say fake DB. Our all work gonna revolve around this now.
 
 // We are creating a method not a function to check whether the course exist.
 
@@ -76,13 +68,13 @@ if that so it will gonna return true which means the provided course doesnt exis
 And if you have taken my methods tutorial then you must know that how do we use a method
 */
 
-
 func (_course *Course) checkIfEmpty() bool {
 
-	return _course.CourseName == "";
+	return _course.CourseName == ""
 
 }
 
+// CONTROLLERS
 
 /*
 In our above session we saw kind of models , so now in this session we gonna see controllers.
@@ -102,10 +94,9 @@ will visit to our homepage he/she will see this response , i have discussed abou
 in sample server tutorial so kindly check it for more details.
 */
 
-func renderingHomePage(w http.ResponseWriter , r *http.Request){
+func renderingHomePage(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte("<h1>This is Our Homepage</h1>"))
-
 
 }
 
@@ -150,25 +141,23 @@ dont worry if you are finding this little complicated , its absolutely fine to f
 understanding the syntax, you  will get familiar with the syntax soon dont worry just code along with me.
 */
 
-func getAllCourses(w http.ResponseWriter , r *http.Request){
+func getAllCourses(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Getting All Courses")
 
-	w.Header().Set("Content-Type" , "application/json");
+	w.Header().Set("Content-Type", "application/json")
 
 	if len(courses) > 0 {
 
-		json.NewEncoder(w).Encode(courses);
+		json.NewEncoder(w).Encode(courses)
 
-
-	}else{
+	} else {
 
 		json.NewEncoder(w).Encode("There are no courses to display")
 
 	}
 
-}	
-
+}
 
 /*
 
@@ -201,30 +190,29 @@ want to use it or not as it gonna work same ways.
 
 */
 
-func getOneCourse(w http.ResponseWriter , r *http.Request){
+func getOneCourse(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("Getting Single Course");
+	fmt.Println("Getting Single Course")
 
-	w.Header().Set("Content-Type" , "application/json");
+	w.Header().Set("Content-Type", "application/json")
 
-	params := mux.Vars(r);
+	params := mux.Vars(r)
 
-	for _ , course := range courses{
+	for _, course := range courses {
 
-		if course.CourseId == params["id"]{
+		if course.CourseId == params["id"] {
 
-			json.NewEncoder(w).Encode(course);
+			json.NewEncoder(w).Encode(course)
 
-		}else{
+		} else {
 
-			json.NewEncoder(w).Encode("Please Enter A Valid Id");
+			json.NewEncoder(w).Encode("Please Enter A Valid Id")
 
 		}
 
 	}
 
-
-}	
+}
 
 /*
 
@@ -272,15 +260,13 @@ Then at last using return.
 
 */
 
+func addOneCourse(w http.ResponseWriter, r *http.Request) {
 
-func addOneCourse(w http.ResponseWriter , r *http.Request){
+	fmt.Println("Adding One Course")
 
-	fmt.Println("Adding One Course");
+	w.Header().Set("Content-Type", "application/json")
 
-	w.Header().Set("Content-Type" , "application/json");
-
-
-	if r.Body == nil{
+	if r.Body == nil {
 
 		json.NewEncoder(w).Encode("Please Provide Data To Add Course")
 
@@ -288,25 +274,101 @@ func addOneCourse(w http.ResponseWriter , r *http.Request){
 
 	var course Course
 
-	json.NewDecoder(r.Body).Decode(&course);
+	json.NewDecoder(r.Body).Decode(&course)
 
-	if course.checkIfEmpty(){
+	if course.checkIfEmpty() {
 
-		json.NewEncoder(w).Encode("Body of the course cannot be empty");
+		json.NewEncoder(w).Encode("Body of the course cannot be empty")
 
 	}
 
-	source := rand.NewSource(time.Now().UnixNano());
+	source := rand.NewSource(time.Now().UnixNano())
 
-	randomNumber := rand.New(source);
+	randomNumber := rand.New(source)
 
-	course.CourseId = strconv.Itoa(randomNumber.Intn(20));
+	course.CourseId = strconv.Itoa(randomNumber.Intn(20))
 
-	courses = append(courses , course);
+	courses = append(courses, course)
 
-	json.NewEncoder(w).Encode(course);
+	json.NewEncoder(w).Encode(course)
 
-}	
+}
+
+/*
+So with this controller/function we are updating an exisisting course as user have to provide the id of
+the course and the data to update the course.
+
+So in starting following the same approach taking parameters then setting the header.
+
+Now first of all we are checking whether the user is sending something or not if the body is empty then we are
+sending the response saying please provide data , if there is some data then we will move to our next step
+
+Which is to grab the id which the user is providing to us , after getting id we gonna run a loop
+on the exisisting courses with the help of for and range keyword (if you dont kwow about loop
+check my loop session) , now inside this we are checking that whether there is any course id same as the user
+is providing to us , if that so then we are making a new slice which wont include the course which have the
+same id , making a new slice with the help of append keyword , i have explained this in detail in slice session
+
+after that we are declaring a variable of type Course which is our struct this will help us to decode the json
+data exactly into the same structure in which our struct is in.
+
+Now after this we are decoding the data we are getting from r.Body means the data the user is providing
+and decoding this in the form of struct as we are passing the reference of the variable we made of struct type.
+
+This might give us an error but we dont want to know about it thats why we are ignoring it with underscore(_).
+
+After this we are updating the course id with the id the user is providing and after that adding the same
+course which we decoded(we got from the user) into the existing the course slice , and then finally sending
+the response to the user saying that the course has been added successfully.
+
+And if the user is not sending us the id or sending us an invalid id then we are generating a response
+saying Invalid Id Or Missing Data and sending back this to the user.
+*/
+
+func updateOneCourse(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("Updating One Course")
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Body == nil {
+
+		json.NewEncoder(w).Encode("Please enter The Content To Update")
+
+	}
+
+	params := mux.Vars(r)
+
+	for index, course := range courses {
+
+		if course.CourseId == params["id"] {
+
+			courses = append(courses[:index], courses[index+1:]...)
+
+			var course Course
+
+			json.NewDecoder(r.Body).Decode(&course)
+
+			if course.checkIfEmpty() {
+
+				json.NewEncoder(w).Encode("Body Of The Course Cannot Be Empty")
+
+			}
+
+			course.CourseId = params["id"]
+
+			courses = append(courses, course)
+
+			json.NewEncoder(w).Encode("Course Has Been Updated Successfully")
+
+		} else {
+
+			json.NewEncoder(w).Encode("Please Enter A Valid id")
+
+		}
+
+	}
+
+}
 
 //stay tuned for more updates
-
