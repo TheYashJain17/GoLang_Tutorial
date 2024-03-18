@@ -371,4 +371,57 @@ func updateOneCourse(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//stay tuned for more updates
+/*
+
+So this is our last controller/function to delete the course , as till now we have seen all the operations
+till yet so only this was remaining.
+
+All the things are same like till now we are doing like taking parameters and settng headers.
+
+Now we have to delete a course , so for deleting a particular course we need id of that course ,
+So we will get that id from the user like we got before with the help of mux and its Vars() property
+and inside it we are providing the r which is storing the user request.
+
+if you want to know the above procedure in detail , check out my previous posts , i have explained this
+in detail there.
+
+This will give us the id which the user is providing , now we will gonna perform the loop on the courses
+which is a slice of the struct Course , now we are using for loop with the help of range keyword ,
+now inside this we are checking the id provided by the user and id of the exisisting courses , if there
+is any matching id then we will create another slice and this is a trick as with this trick we are creating
+a new slice with the help of append method  creating  a slice which will be till that index which is the
+id user is providing (if it is valid) and then the new one will start from the next value after the index
+and joining both of these will give us a proper new slice which will not include that data which have id
+similar to the id the user is providing (if you want to know about this in detail then read
+from my prevous sessions).
+And at last sending a response to the user saying the course has been deleted successfully.
+
+*/
+
+func deleteOneCourse(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("Deleting One Course")
+
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	for index, course := range courses {
+
+		if course.CourseId == params["id"] {
+
+			courses = append(courses[:index], courses[index+1:]...)
+
+			json.NewEncoder(w).Encode(courses)
+
+		} else {
+
+			json.NewEncoder(w).Encode("Please Enter A Valid Id")
+
+		}
+
+	}
+
+}
+
+//Stay tuned for more updates.
