@@ -21,6 +21,43 @@ import (
 
 func main() {
 
+	/*
+	   Now as you know we are working with a fake db , we have to feed data by ourself as when we will work with
+	   real database this will not be needed , but for now we have to do it , this process is known as seeding data.
+	*/
+
+	//seeding data
+
+	/*
+	   Now just entering the data into our slice of courses according to the struct we made.
+
+	   If you remember we have taken a struct into another struct thats why we are handling in this way.
+	*/
+
+	// Adding multiple data into the slice.
+
+	courses = append(courses, Course{CourseId: "1", CourseName: "GoLang",
+		CoursePrice: 199,
+		CourseAuthor: Author{
+			AuthorName:    "Yash Jain",
+			AuthorWebsite: "linkedin.com/theyashjain17"}})
+
+	courses = append(courses, Course{CourseId: "2", CourseName: "Solidity",
+		CoursePrice: 299,
+		CourseAuthor: Author{
+			AuthorName:    "Yash Jain",
+			AuthorWebsite: "linkedin.com/theyashjain17"}})
+
+	courses = append(courses, Course{CourseId: "3", CourseName: "Rust",
+		CoursePrice: 399,
+		CourseAuthor: Author{
+			AuthorName:    "Yash Jain",
+			AuthorWebsite: "linkedin.com/theyashjain17"}})
+
+	// Now We are done with the seeding of the data.
+
+	// Stay tuned for more updates.
+
 }
 
 // MODEL SECTION
@@ -424,4 +461,45 @@ func deleteOneCourse(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//Stay tuned for more updates.
+/*
+
+So now this our controller/function which will help us to delete all the values of the the courses array.
+
+We are doing the same which we are doing in every controller , taking parameters then setting the headers.
+
+This one is simple one as we just have to set the slice to nil this will delete all the values of the slice
+in single go , there are many more methods to do the same thing i have chosen this one , you can go with anyone
+you like.
+
+So first we are checking that whether the length of the slice is greater than 0 or not , we are doing this with
+the help of len function of go inside it passing our courses slice, if the length is greater than 0 then
+set the slice to nil , then send the response to the user/anyone that all courses has been deleted successfully
+
+Till now you must have understood that how we send the response to the user in json ,
+if not then you need practice.
+
+And if there are no courses then simply telling the user that there are courses to delete.
+
+*/
+
+func deleteAllCourses(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("Deleting all the courses")
+
+	w.Header().Set("Cpntent-Type", "application/json")
+
+	if len(courses) > 0 {
+
+		courses = nil
+
+		json.NewEncoder(w).Encode("All The Courses has been deleted Successfully")
+
+	} else {
+
+		json.NewEncoder(w).Encode("There are no courses to delete")
+
+	}
+
+}
+
+// Stay tuned For more updates.
