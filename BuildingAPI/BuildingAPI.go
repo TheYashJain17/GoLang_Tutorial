@@ -10,9 +10,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
+	"log"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -56,7 +56,52 @@ func main() {
 
 	// Now We are done with the seeding of the data.
 
-	// Stay tuned for more updates.
+	/*
+	   This follows a simple approach , we take the variable in which stored the router we made above which r in this
+	   case and on that we are using HandleFunc which will help us handle the route.
+
+	   This function takes 2 parameters first the route and second the function/controller we made.
+
+	   Now on this whole function we have to use Methods means what user can do with this route , like if we want to
+	   show some data to the user or can say user want to see some data then we will use GET method as it will
+	   get the data , similarly if we want the user to add some data then we will use POST method and so on.
+	*/
+
+	/*
+	   GET means getting the data.
+	   POST means sending the data.
+	   PUT/PATCH means updating the data.
+	   DELETE means deleting the data.
+	*/
+
+	/*
+	   Basically when we are creating a REST/Restful API , we follow a general convention of taking the same name
+	   This is not mandatory but this gives the API a professional look and this is generally get followed in the
+	   industry , therefore i have gone with the same approach , if you want you can put names whatever you want to.
+	*/
+
+	r := mux.NewRouter();
+
+	r.HandleFunc("/" , renderingHomePage).Methods("GET"); //slash(/) means homepage means the first route user will see and on that we want the user to see the controller we made to handle homepage therefore using GET Method.Check servehome Controller to see what we will get.
+
+	r.HandleFunc("/courses" , getAllCourses).Methods("GET"); // /courses is the route for this one , when someone will hit this route , getAllCourses controller will be called and if there would be any data in the db then the user will be able to see all the courses.
+
+	r.HandleFunc("/courses/{id}" , getAllCourses).Methods("GET"); // /courses/{id} is the route for this one and {id} means that we are asking for the id from the user , this will be used as user will get the single course based on the id he/she is providing , when someone will hit this route , getSingleCourse controller will be called and the id provided by the user will be entered into this function and if there would be any data in the db regarding this id then the user will be able to see that course.
+
+	r.HandleFunc("/courses" , addOneCourse).Methods("POST"); // /courses is the route for this one , when someone will hit this route , addOneCourse controller will be called and as we know this is the POST Method so we are taking the data which the user is providing and entering it into our db.
+
+	r.HandleFunc("/courses/{id}" , updateOneCourse).Methods("PUT"); // /courses/{id} is the route for this one and we are taking the id from the user as we want to know that what is the data the user want to update and we will find that data with the help of the id which the user will provide to us therefore it is important to take the id from the user , when someone will hit this route , UpdateOneCourse controller will be called and the id and the data entered by the user will be enter intp the desired field , if everything executed perfectly then the data will be updated successfully.
+
+	r.HandleFunc("/courses/{id}" , deleteOneCourse).Methods("DELETE"); // /courses/{id} is the route for this one  as we are taking the id from the user as it is important to know that which one is the data , the user wants to delete , when someone will hit this route , DeleteOneCourse controller will be called and the id will be entered into it and if everything executed sucessfully the course with the id provided by the user will br deleted successfully.
+
+	r.HandleFunc("/courses" , deleteAllCourses).Methods("DELETE"); // /courses is the route for this one , when someone will hit this route , DeleteAllCourses controller will be called and it will successfully delete all the courses present inside the slice.
+
+	log.Fatal(http.ListenAndServe(":8000" , r)) //generally we use fmt.Println to print something to console , but when we are handling the API we use log.Fatal therefore using it and inside it we are using http module and its ListenAndServe property to listen the server we created on a port like generally there are ports like localhost:3000 or something , i am using port :8000 as there is my another project which is runnig on port :3000 , if you want you can use 3000 , now after this we have to provide our router which is r in this case therefore doing so.
+
+	// And thats it your rest API is completed And ready to get used.
+
+	//Stay Tuned For More Updates.
+
 
 }
 
