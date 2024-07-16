@@ -7,8 +7,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"         //install this package as we need this package to make a connection with mongo , just type go get -u go.mongodb.org/mongo-driver/mongo
 	"go.mongodb.org/mongo-driver/mongo/options" //this package will gonna install with the above package.
 )
@@ -62,7 +65,22 @@ Congrats you have learnt to connect with the mongodb with the help of go.
 
 func connectionWithMongo() {
 
-	clientOptions := options.Client().ApplyURI("mongodb+srv://Yashjain:thisismypasswordyouasshole666@cluster0.r9okdwn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+	err := godotenv.Load()
+	if err != nil {
+
+		fmt.Println("Please Create Dot ENV File")
+
+	}
+
+	mongo_url := os.Getenv("MONGO_URL")
+
+	if mongo_url == "" {
+
+		fmt.Println("Please Provide mongodb url")
+
+	}
+
+	clientOptions := options.Client().ApplyURI(mongo_url)
 
 	ctxt, cancel := context.WithTimeout(context.Background(), time.Second*10)
 
@@ -84,7 +102,73 @@ func connectionWithMongo() {
 
 	}
 
-	fmt.Println("MONGODB CONNECTED")
+	fmt.Println("MONGODB CONNECTED") //we completed our last session till here.
+
+	// Now starting this session from here.
+
+	/*
+
+		So basically we estblished a connection with mongo in our previous session , but the thing we werent getting anything from as we are just
+		simply printing out that MONGODB CONNECTED!...
+
+		So now lets level up the game little bit and read the data from the database to confirm that we are connected with our database.
+
+		So lets first do few things to ensure that we will get the data.
+
+		First obviously create a database , if you havent already then make a collection inside it like i have defined in the code and then
+		inside that collection make a sample document which we can read here , so do all these things first then come back here.
+
+		So Now Lets begin.
+
+		so first we are getting the collection associated with the database whose link we have provided in dotenv file , if you didnt understand
+		this check out my previous session then you will understand it.
+
+		so for getting the collection we are using the client we made above and then providing the exact name of database then the exact name of
+		collection we made as i told you.
+
+		then we are creating a variable of bson.D type , we have taken this type because mongodb supports bson data and we are using bson.D
+		because we want to get data in structured manner , there are mainly 2 types in bson :- bson.D which provides the structured data and
+		another is bson.M which provides the unstructured data , so we have made a variable of bson.D type.
+
+		Now we are using the collection we stored above and on that we are running the FindOne operation of mongodb and this takes 2 parameters
+		first is the context we made above and second is an interface which should be of bson type we can take any type like .M or .D , i have taken
+		the oppposite and we have taken an interface because data present inside the collection could be of many types like string int bool so
+		in this type of case interface is best and now we will use .Decode to decode the data we are getting in the format we want to and for this
+		i have defined the variable above which is of bson.D this will return the data in structured form , this will gonna return me an error
+		so i am checking that if the error is not equal to nil then check for the type of error like the mongo library we installed it also gives
+		the possible types of errors like here in our case we are checking if the error == mongo.ErrNoDocuments which means there is no document in
+		the collection we have made then we are telling the user the same thing else there is a possibility that the user hasnt made the collection.
+
+		and if everything is sorted we are just printing out the data we got in the decoded form to see it properly.
+
+		Thats how we can check for a proper connection with the mongodb.
+
+
+	*/
+
+	collection := client.Database("GO-API").Collection("test-col")
+
+	var format bson.D
+
+	err = collection.FindOne(ctxt, bson.M{}).Decode(&format)
+
+	if err != nil {
+
+		if err == mongo.ErrNoDocuments {
+
+			fmt.Println("Connected But Couldnt Read Collection")
+
+		} else {
+
+			fmt.Println("Collection doesnt exist")
+
+		}
+
+	} else {
+
+		fmt.Println("Success", format)
+
+	}
 
 }
 
